@@ -1,0 +1,148 @@
+:root {
+    --primary-color: #2a9d8f;
+    --secondary-color: #e9c46a;
+    --background-color: #f4f1de;
+    --text-color: #264653;
+    --card-bg: #ffffff;
+    --danger-color: #e76f51;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    display: grid;
+    gap: 25px;
+}
+
+header {
+    text-align: center;
+    color: var(--primary-color);
+}
+
+header h1 {
+    margin-bottom: 5px;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+    margin-top: 0;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+textarea {
+    min-height: 300px;
+    resize: vertical;
+}
+
+.generate-button, .action-button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.generate-button:hover {
+    background-color: #21867a;
+}
+
+.result-area {
+    text-align: center;
+}
+
+video {
+    width: 100%;
+    max-height: 500px;
+    border-radius: 10px;
+    background: #000;
+    margin-top: 20px;
+}
+
+/* Galeri Karakter */
+.characters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.character-card {
+    background: var(--background-color);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.character-card .icon {
+    font-size: 40px;
+}
+
+.character-card h4 {
+    margin: 10px 0 5px 0;
+}
+
+.character-card p {
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid var(--primary-color);
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

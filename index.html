@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iako Animation Studio - AI Video Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Iako Animation Studio</h1>
+            <p>Generator Video Animasi 3D Berbasis Teks (JSON)</p>
+        </header>
+
+        <section class="card api-config">
+            <h2>🔑 Konfigurasi API Video</h2>
+            <div class="input-group">
+                <label for="apiEndpoint">URL Endpoint API:</label>
+                <input type="text" id="apiEndpoint" placeholder="Contoh: https://api.veo3.com/v1/generate">
+            </div>
+            <div class="input-group">
+                <label for="apiKey">API Key Anda:</label>
+                <input type="password" id="apiKey" placeholder="Masukkan API Key dari layanan video AI Anda">
+            </div>
+        </section>
+
+        <section class="card character-gallery">
+            <h2>👥 Galeri Karakter Desa Rimbun</h2>
+            <div class="characters">
+                </div>
+        </section>
+
+        <section class="card json-input-section">
+            <h2>✍️ Masukkan Prompt Cerita (JSON)</h2>
+            <p>Tempelkan struktur JSON cerita Anda di bawah ini. Durasi total akan dihitung otomatis berdasarkan jumlah adegan.</p>
+            <textarea id="jsonInput" placeholder="Tempelkan prompt JSON Anda di sini..."></textarea>
+            <button id="generateBtn" class="generate-button">✨ Generate Video Animasi (3 Menit)</button>
+        </section>
+        
+        <section id="resultArea" class="card result-area" style="display: none;">
+            <h2>🎉 Video Anda Telah Siap!</h2>
+            <div id="loading" class="loading-spinner"></div>
+            <video id="videoResult" controls></video>
+            <div class="video-actions">
+                 <a id="downloadBtn" class="action-button" download="film_iako.mp4">Unduh Video</a>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
