@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Definisi Karakter dan Voice Mappings
+    // Definisi Karakter (tidak dikirim ke API, hanya untuk referensi)
     const characters = [
-        { id: "Iako", name: "Iako", desc: "Anak 4 tahun, ceria", icon: "👦", voice: "child_male_indonesian" },
-        { id: "Iopatua", name: "Iopatua", desc: "Kakek 60 tahun, bijak", icon: "👴", voice: "elderly_male_indonesian" },
-        { id: "Iomatua", name: "Iomatua", desc: "Nenek 50 tahun, penyayang", icon: "👵", voice: "elderly_female_indonesian" },
-        { id: "Nike", name: "Nike", desc: "Bibi 29 tahun, ramah", icon: "👩", voice: "adult_female_indonesian_friendly" },
-        { id: "Ndege", name: "Ndege", desc: "Ayah 40 tahun, humoris", icon: "👨‍🦰", voice: "adult_male_indonesian_wise" },
-        { id: "Aslina", name: "Aslina", desc: "Ibu 40 tahun, lembut", icon: "👩‍🦱", voice: "adult_female_indonesian_low" }
+        { id: "Iako", name: "Iako", desc: "Anak 4 tahun, ceria", icon: "👦" },
+        { id: "Iopatua", name: "Iopatua", desc: "Kakek 60 tahun, bijak", icon: "👴" },
+        { id: "Iomatua", name: "Iomatua", desc: "Nenek 50 tahun, penyayang", icon: "👵" },
+        { id: "Nike", name: "Nike", desc: "Bibi 29 tahun, ramah", icon: "👩" },
+        { id: "Ndege", name: "Ndege", desc: "Ayah 40 tahun, humoris", icon: "👨‍🦰" },
+        { id: "Aslina", name: "Aslina", desc: "Ibu 40 tahun, lembut", icon: "👩‍🦱" }
     ];
 
     // Tampilkan Galeri Karakter secara Dinamis
@@ -34,7 +34,121 @@ document.addEventListener('DOMContentLoaded', () => {
     // Contoh JSON untuk placeholder
     jsonInput.value = JSON.stringify(
         {
-          "episode": "1",
+          "title": "Rahasia Hutan Desa Rimbun",
+          "scenes": [
+            {
+              "prompt": "Pagi hari di desa pegunungan Indonesia yang asri, kabut tipis masih menyelimuti. Wide shot menyorot desa lalu zoom ke rumah kayu sederhana. Seorang anak laki-laki bernama Iako berlari keluar.",
+              "duration_seconds": 10
+            },
+            {
+              "prompt": "Di halaman rumah, seorang kakek tua (Iopatua) sedang duduk di kursi bambu. Iako mendekatinya. Iopatua tersenyum bijaksana. Medium shot.",
+              "duration_seconds": 8
+            }
+          ]
+        }, null, 2
+    );
+
+    generateBtn.addEventListener('click', async () => {
+        const apiKey = apiKeyInput.value.trim();
+        const apiEndpoint = apiEndpointInput.value.trim();
+        let promptData;
+
+        // 1. Validasi Input
+        if (!apiKey || !apiEndpoint) {
+            alert("Harap masukkan URL Endpoint API dan API Key Anda.");
+            return;
+        }
+        try {
+            promptData = JSON.parse(jsonInput.value);
+        } catch (error) {
+            alert("Format JSON tidak valid. Harap periksa kembali.");
+            return;
+        }
+
+        // 2. Tampilkan Loading
+        resultArea.style.display = 'block';
+        videoResult.style.display = 'none';
+        loadingSpinner.style.display = 'block';
+        downloadBtn.style.display = 'none';
+
+        // 3. Siapkan data untuk dikirim ke API RunwayML
+        // Menggabungkan semua prompt scene menjadi satu teks panjang
+        const fullPrompt = promptData.scenes.map(scene => scene.prompt).join(" ");
+        
+        const requestBody = {
+            "text_prompt": fullPrompt,
+            "motion": 2.5, // nilai default untuk pergerakan
+            "seed": Math.floor(Math.random() * 1000000) // seed acak untuk hasil berbeda
+        };
+        
+        try {
+            // 4. Kirim Permintaan ke API
+            const response = await fetch(apiEndpoint + '/generate', { // Pastikan endpoint diakhiri dengan /generate
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`API Error (${response.status}): ${errorData.message || 'Gagal memulai video generation'}`);
+            }
+
+            const result = await response.json();
+            const taskId = result.uuid;
+
+            // 5. Cek status video secara berkala
+            checkTaskStatus(taskId, apiKey, apiEndpoint);
+
+        } catch (error) {
+            loadingSpinner.style.display = 'none';
+            alert(`Terjadi kesalahan saat memulai: ${error.message}`);
+            console.error(error);
+        }
+    });
+
+    async function checkTaskStatus(taskId, apiKey, apiEndpoint) {
+        const interval = setInterval(async () => {
+            try {
+                const response = await fetch(`${apiEndpoint}/tasks/${taskId}`, {
+                    headers: { 'Authorization': `Bearer ${apiKey}` }
+                });
+                
+                if (!response.ok) {
+                    clearInterval(interval);
+                    throw new Error('Gagal memeriksa status task.');
+                }
+
+                const result = await response.json();
+
+                if (result.status === "succeeded") {
+                    clearInterval(interval);
+                    // 6. Tampilkan Hasil
+                    const videoUrl = result.output.video_path;
+                    videoResult.src = videoUrl;
+                    downloadBtn.href = videoUrl;
+                    
+                    loadingSpinner.style.display = 'none';
+                    videoResult.style.display = 'block';
+                    downloadBtn.style.display = 'inline-block';
+                } else if (result.status === "failed") {
+                    clearInterval(interval);
+                    loadingSpinner.style.display = 'none';
+                    alert('Maaf, AI gagal membuat video.');
+                }
+                // Jika masih "processing", biarkan interval berjalan
+            } catch (error) {
+                clearInterval(interval);
+                loadingSpinner.style.display = 'none';
+                alert(`Terjadi kesalahan saat memeriksa status: ${error.message}`);
+                console.error(error);
+            }
+        }, 5000); // Cek setiap 5 detik
+    }
+});          "episode": "1",
           "title": "Rahasia Hutan Desa Rimbun",
           "scenes": [
             {
